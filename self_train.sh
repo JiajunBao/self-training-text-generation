@@ -19,7 +19,7 @@ mkdir -p ${SAVE}
 
 # ---- pseudo training ---- #
 
-fairseq-train wmt14_en_de_bin \
+MKL_THREADING_LAYER=GNU  fairseq-train wmt14_en_de_bin \
      -a ${model} --optimizer adam --lr 0.0005 -s ${src} -t ${tgt} \
      --dropout ${dropout} --max-tokens 4096 \
      --min-lr '1e-09' --lr-scheduler inverse_sqrt --weight-decay 0.0001 \
@@ -36,13 +36,13 @@ wait $!
 
 # ---- check performance ---- #
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE}/gen_last.out
 wait $!
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU  fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE}/gen_best.out
 wait $!
 
@@ -52,7 +52,7 @@ mkdir -p ${SAVE2}
 
 cp ${SAVE}/checkpoint_best.pt ${SAVE2}/checkpoint_load.pt
 
-fairseq-train wmt14_en_de_bin \
+MKL_THREADING_LAYER=GNU  fairseq-train wmt14_en_de_bin \
      -a ${model} --optimizer adam --lr 0.0005 -s en -t de \
      --dropout ${dropout} --max-tokens 4096 \
      --min-lr '1e-09' --lr-scheduler inverse_sqrt --weight-decay 0.0001 \
@@ -70,12 +70,12 @@ wait $!
 
 # ---- check performance ---- #
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE2}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE2}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE2}/gen_last.out
 wait $!
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE2}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE2}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE2}/gen_best.out
 wait $!

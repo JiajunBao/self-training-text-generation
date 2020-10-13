@@ -18,7 +18,7 @@ mkdir -p ${SAVE}
 
 # ---- supervised training ---- #
 
-fairseq-train wmt14_en_de_bin \
+MKL_THREADING_LAYER=GNU fairseq-train wmt14_en_de_bin \
      -a ${model} --optimizer adam --lr 0.0005 -s ${src} -t ${tgt} \
      --dropout ${dropout} --max-tokens 4096 \
      --min-lr '1e-09' --lr-scheduler inverse_sqrt --weight-decay 0.0001 \
@@ -30,19 +30,19 @@ fairseq-train wmt14_en_de_bin \
      --share-all-embeddings \
      --save-interval-updates 100 \
      --update-freq 1 --fp16 \
-     --validate-interval 1000 --keep-interval-updates 10 --save-interval 1000\
+     --validate-interval 1000 --keep-interval-updates 10 --save-interval 1000 \
     | tee -a ${SAVE}/stdout.log
 wait $!
 
 # ---- check performance ---- #
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE}/checkpoint_last.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE}/gen_last.out
 wait $!
 
-fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
-    --path ${SAVE}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe \
+MKL_THREADING_LAYER=GNU fairseq-generate wmt14_en_de_bin --source-lang en --target-lang de \
+    --path ${SAVE}/checkpoint_best.pt --beam 5 --batch-size 128 --remove-bpe sentencepiece \
     > ${SAVE}/gen_best.out
 wait $!
 
